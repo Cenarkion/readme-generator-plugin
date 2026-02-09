@@ -56,19 +56,90 @@ cp -r readme-generator-plugin/skills/readme-generator ~/.claude/skills/
 
 Each team member will then have the `/readme-generator` skill available in all their projects.
 
-## Usage
+### CLI Wrapper Script (Optional but Recommended)
 
-Navigate to any project directory and run:
+For even faster usage, install the CLI wrapper script to generate READMEs from the command line without entering an interactive Claude session:
 
 ```bash
+# Copy the script to your local bin directory
+sudo cp readme-generator-plugin/generate-readme /usr/local/bin/
+
+# Make it executable (if not already)
+sudo chmod +x /usr/local/bin/generate-readme
+
+# Verify installation
+generate-readme --help
+```
+
+Now you can generate READMEs from anywhere with a single command:
+
+```bash
+# Navigate to any project
+cd /path/to/your/project
+
+# Generate README
+generate-readme
+
+# Or with specific project type
+generate-readme terraform
+
+# Or with focus areas
+generate-readme python api testing
+```
+
+The CLI wrapper provides:
+- **One-command execution** - no need to enter Claude interactive session
+- **Automatic file writing** - README.md is created/updated directly
+- **Verification** - confirms the file was generated successfully
+- **Scriptable** - perfect for CI/CD or batch processing
+
+## Usage
+
+### Method 1: CLI Wrapper (Fastest)
+
+If you installed the `generate-readme` script:
+
+```bash
+# Navigate to your project
+cd /path/to/your/project
+
 # Generate README with auto-detection
-/readme-generator
+generate-readme
 
 # Specify project type
-/readme-generator terraform
+generate-readme terraform
 
 # Focus on specific areas
+generate-readme python deployment troubleshooting
+
+# Show help
+generate-readme --help
+```
+
+### Method 2: Interactive Claude Session
+
+Launch Claude Code and use the skill interactively:
+
+```bash
+# Navigate to your project and start Claude
+cd /path/to/your/project
+claude
+
+# Then use the skill
+/readme-generator
+
+# With arguments
+/readme-generator terraform
 /readme-generator python deployment troubleshooting
+```
+
+### Method 3: Programmatic Mode
+
+For scripting or automation:
+
+```bash
+claude -p "Use the readme-generator skill to create a comprehensive README.md file. Write the output to README.md using the Write tool." \
+  --allowedTools "Read,Glob,Grep,Bash,Write,Edit,Task"
 ```
 
 ## What Gets Generated

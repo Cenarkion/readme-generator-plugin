@@ -1,0 +1,105 @@
+#!/bin/bash
+#
+# generate-readme - CLI wrapper for the readme-generator Claude Code skill
+#
+# Usage:
+#   generate-readme                    # Auto-detect project type
+#   generate-readme terraform          # Specify project type
+#   generate-readme python api testing # Specify type and focus areas
+#
+
+set -e
+
+# Show help if requested
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    cat << 'EOF'
+generate-readme - Generate comprehensive README.md files using Claude Code
+
+USAGE:
+    generate-readme [PROJECT_TYPE] [FOCUS_AREAS...]
+    generate-readme -h|--help
+
+DESCRIPTION:
+    Creates or updates README.md in the current directory using the readme-generator
+    Claude Code skill. Automatically detects project type and extracts real commands,
+    configurations, and examples from your codebase.
+
+OPTIONS:
+    -h, --help          Show this help message and exit
+
+ARGUMENTS:
+    PROJECT_TYPE        Optional project type to override auto-detection
+                        Options: terraform, python, nodejs, go, rust, docker,
+                                cloudformation, pulumi
+
+    FOCUS_AREAS         Optional sections to emphasize in the README
+                        Options: architecture, deployment, troubleshooting,
+                                api, testing, security
+
+EXAMPLES:
+    # Auto-detect project type and generate README
+    generate-readme
+
+    # Generate README for a Terraform project
+    generate-readme terraform
+
+    # Generate README with focus on specific areas
+    generate-readme python deployment troubleshooting
+
+    # Generate README for Node.js project focusing on API and testing
+    generate-readme nodejs api testing
+
+REQUIREMENTS:
+    - Claude Code CLI must be installed (https://claude.com/code)
+    - readme-generator skill must be installed in ~/.claude/skills/
+
+OUTPUT:
+    Creates or updates README.md in the current directory with comprehensive
+    documentation including: project overview, architecture, commands, configuration,
+    deployment, testing, troubleshooting, and governance notes.
+
+EOF
+    exit 0
+fi
+
+# Check if claude is installed
+if ! command -v claude &> /dev/null; then
+    echo "Error: Claude Code CLI is not installed or not in PATH"
+    echo "Install from: https://claude.com/code"
+    exit 1
+fi
+
+# Capture current timestamp for verification
+START_TIME=$(date +%s)
+
+# Build the prompt
+if [ $# -eq 0 ]; then
+    # No arguments - auto-detect
+    PROMPT="Use the readme-generator skill to create a comprehensive README.md file. Write the output to README.md using the Write tool."
+else
+    # Arguments provided - pass them to the skill
+    ARGS="$*"
+    PROMPT="Use the readme-generator skill with these arguments: ${ARGS}. Create a comprehensive README.md file and write the output to README.md using the Write tool."
+fi
+
+# Run Claude Code in programmatic mode
+claude -p "${PROMPT}" --allowedTools "Read,Glob,Grep,Bash,Write,Edit,Task"
+
+# Check if README.md was created/updated in the last 10 seconds
+if [ -f README.md ]; then
+    FILE_MOD_TIME=$(stat -c %Y README.md 2>/dev/null || stat -f %m README.md 2>/dev/null)
+    TIME_DIFF=$(($(date +%s) - FILE_MOD_TIME))
+
+    if [ $TIME_DIFF -le 10 ]; then
+        echo ""
+        echo "✓ README.md generated successfully"
+    else
+        echo ""
+        echo "✗ Warning: README.md exists but was not updated by this run"
+        exit 1
+    fi
+else
+    echo ""
+    echo "✗ Error: README.md was not created"
+    exit 1
+fi
