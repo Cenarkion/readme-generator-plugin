@@ -1,0 +1,24 @@
+{
+  "name": "readme-generator",
+  "version": "1.0.0",
+  "description": "Professional README.md generator for software projects. Creates comprehensive, well-structured documentation with consistent quality across Terraform, Python, Node.js, Go, and other project types.",
+  "author": "TfNSW Cloud Centre of Excellence",
+  "repository": "https://github.com/Cenarkion/readme-generator-plugin",
+  "claudeCodeMinVersion": "0.1.0",
+  "skills": [
+    "skills/readme-generator"
+  ],
+  "keywords": [
+    "documentation",
+    "readme",
+    "terraform",
+    "infrastructure-as-code",
+    "aws",
+    "python",
+    "nodejs"
+  ],
+  "license": "MIT",
+  "changelog": {
+    "1.0.0": "Initial release - comprehensive README generator with support for multiple project types"
+  }
+}
