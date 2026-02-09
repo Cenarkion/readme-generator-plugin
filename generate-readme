@@ -69,7 +69,7 @@ if ! command -v claude &> /dev/null; then
     exit 1
 fi
 
-# Capture current timestamp for verification
+# Capture current timestamp for verification (before running Claude)
 START_TIME=$(date +%s)
 
 # Build the prompt
@@ -85,17 +85,32 @@ fi
 # Run Claude Code in programmatic mode
 claude -p "${PROMPT}" --allowedTools "Read,Glob,Grep,Bash,Write,Edit,Task"
 
-# Check if README.md was created/updated in the last 10 seconds
-if [ -f README.md ]; then
-    FILE_MOD_TIME=$(stat -c %Y README.md 2>/dev/null || stat -f %m README.md 2>/dev/null)
-    TIME_DIFF=$(($(date +%s) - FILE_MOD_TIME))
+# Small delay to ensure file system has flushed
+sleep 1
 
-    if [ $TIME_DIFF -le 10 ]; then
+# Check if README.md was created/updated after the script started
+if [ -f README.md ]; then
+    # Try Linux stat format first, then BSD/macOS format
+    FILE_MOD_TIME=$(stat -c %Y README.md 2>/dev/null || stat -f %m README.md 2>/dev/null)
+
+    # Check if stat command succeeded
+    if [ -z "$FILE_MOD_TIME" ]; then
+        echo ""
+        echo "✗ Error: Could not read README.md modification time"
+        echo "Debug: stat command failed on this system"
+        exit 1
+    fi
+
+    # Compare file modification time against when script started
+    # File should have been modified AFTER we started (FILE_MOD_TIME >= START_TIME)
+    if [ "$FILE_MOD_TIME" -ge "$START_TIME" ]; then
         echo ""
         echo "✓ README.md generated successfully"
     else
         echo ""
         echo "✗ Warning: README.md exists but was not updated by this run"
+        echo "Debug: File modified at $(date -d @${FILE_MOD_TIME} 2>/dev/null || date -r ${FILE_MOD_TIME} 2>/dev/null)"
+        echo "Debug: Script started at $(date -d @${START_TIME} 2>/dev/null || date -r ${START_TIME} 2>/dev/null)"
         exit 1
     fi
 else
