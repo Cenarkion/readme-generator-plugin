@@ -12,21 +12,49 @@ A professional README.md generator skill for Claude Code that creates comprehens
 
 ## Installation
 
-### From GitHub (once published)
+### Quick Installation (Recommended)
 
-```bash
-claude plugin install github.com/Cenarkion/readme-generator-plugin
-```
-
-### Manual Installation
+The simplest way to use this skill is to copy it directly to your Claude Code skills directory:
 
 ```bash
 # Clone the repository
 git clone https://github.com/Cenarkion/readme-generator-plugin.git
 
-# Install the plugin
-claude plugin install /path/to/readme-generator-plugin
+# Copy the skill to your Claude skills directory
+cp -r readme-generator-plugin/skills/readme-generator ~/.claude/skills/
+
+# Verify installation
+ls ~/.claude/skills/readme-generator/
 ```
+
+The skill is now available in any Claude Code session. Just type `/readme-generator` in any project!
+
+### Updating the Skill
+
+To get the latest version:
+
+```bash
+# Navigate to your cloned repository
+cd readme-generator-plugin
+
+# Pull latest changes
+git pull
+
+# Copy updated skill
+cp -r skills/readme-generator ~/.claude/skills/
+```
+
+### Team Installation
+
+Share these instructions with your team, or add to your team documentation:
+
+```bash
+# One-time setup per developer
+git clone https://github.com/Cenarkion/readme-generator-plugin.git
+cp -r readme-generator-plugin/skills/readme-generator ~/.claude/skills/
+```
+
+Each team member will then have the `/readme-generator` skill available in all their projects.
 
 ## Usage
 
